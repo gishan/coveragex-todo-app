@@ -6,9 +6,12 @@
         "packages/*"
     ],
     "scripts": {
-        "test": "vitest"
+        "test": "vitest",
+        "cy:open": "cypress open",
+        "cy:run": "cypress run"
     },
     "devDependencies": {
+        "cypress": "^13.17.0",
         "jsdom": "^26.0.0",
         "vitest": "^2.1.8"
     }
