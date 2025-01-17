@@ -1,7 +1,10 @@
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import { createTask, fetchLatestTasks, markTaskAsDone } from './service';
 
 const app = express();
+
+app.use(cors())
 app.use(express.json());
 
 const port = 3000;
