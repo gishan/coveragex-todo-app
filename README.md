@@ -17,6 +17,10 @@ npm install
 
 This will install dependencies for all packages in the workspace.
 
+## Environment Variables
+
+Please copy the `.env.example` file to `.env` and edit it according to your needs.
+
 ## Development
 
 To start the react frontend application and the node.js backend application, run:
