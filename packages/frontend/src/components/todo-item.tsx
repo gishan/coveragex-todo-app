@@ -10,7 +10,7 @@ interface TodoItemProps {
 
 export function TodoItem({ todo, onToggleStatus }: TodoItemProps) {
   return (
-    <Card>
+    <Card data-testid="todo-item">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className={`flex-1 ${todo.isDone ? 'text-muted-foreground line-through' : ''}`}>

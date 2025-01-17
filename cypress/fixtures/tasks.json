@@ -1,0 +1,18 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Example Todo 1",
+      "description": "This is an example todo",
+      "done": false,
+      "createdAt": "2024-01-17T12:00:00Z"
+    },
+    {
+      "id": "2",
+      "title": "Example Todo 2",
+      "description": "This is another example todo",
+      "done": true,
+      "createdAt": "2024-01-17T13:00:00Z"
+    }
+  ]
+}
