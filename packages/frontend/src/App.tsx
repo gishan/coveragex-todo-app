@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -6,41 +6,80 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { TodoList } from "@/components/todo-list";
+import { Task } from "./models";
+import config from "./config";
 import './App.css'
 
-interface Todo {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
-}
-
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { setTheme, theme } = useTheme();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(`${config.apiUrl}/tasks`);
+      const data = await response.json();
+      setTodos(data.tasks);
+    } catch (error) {
+      console.error('Failed to fetch tasks:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    const newTodo: Todo = {
-      id: Date.now(),
-      title,
-      description,
-      completed: false,
-    };
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${config.apiUrl}/tasks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+        }),
+      });
 
-    setTodos([...todos, newTodo]);
-    setTitle("");
-    setDescription("");
+      if (!response.ok) {
+        throw new Error('Failed to create task');
+      }
+
+      // Refresh the task list
+      await fetchTasks();
+      
+      // Clear the form
+      setTitle("");
+      setDescription("");
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const toggleTodoStatus = (id: number) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+  const toggleTodoStatus = async (id: string) => {
+    try {
+      const response = await fetch(`${config.apiUrl}/tasks/${id}/done`, {
+        method: 'PATCH',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+
+      // Refresh the task list
+      await fetchTasks();
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
   };
 
   return (
@@ -75,6 +114,7 @@ function App() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter task title"
+                  disabled={isLoading}
                 />
               </div>
               
@@ -88,11 +128,12 @@ function App() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter task description"
                   rows={4}
+                  disabled={isLoading}
                 />
               </div>
 
-              <Button type="submit" className="w-full">
-                Add Task
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Adding Task...' : 'Add Task'}
               </Button>
             </form>
           </CardContent>

@@ -4,15 +4,15 @@ import { describe, it, expect, vi } from 'vitest';
 
 describe('TodoItem Component', () => {
   const mockTodo = {
-    id: 1,
+    id: "1",
     title: 'Test Todo',
     description: 'Test Description',
-    completed: false,
+    isDone: false,
   };
 
   const mockCompletedTodo = {
     ...mockTodo,
-    completed: true,
+    isDone: true,
   };
 
   it('renders todo content correctly', () => {
@@ -45,7 +45,7 @@ describe('TodoItem Component', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
     
-    expect(mockOnToggleStatus).toHaveBeenCalledWith(1);
+    expect(mockOnToggleStatus).toHaveBeenCalledWith("1");
   });
 
   it('shows correct button text based on todo status', () => {

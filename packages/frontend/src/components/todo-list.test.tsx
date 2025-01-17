@@ -5,16 +5,16 @@ import { describe, it, expect } from 'vitest';
 describe('TodoList Component', () => {
   const mockTodos = [
     {
-      id: 1,
+      id: "1",
       title: 'Test Todo 1',
       description: 'Test Description 1',
-      completed: false,
+      isDone: false,
     },
     {
-      id: 2,
+      id: "2",
       title: 'Test Todo 2',
       description: 'Test Description 2',
-      completed: true,
+      isDone: true,
     },
   ];
 
