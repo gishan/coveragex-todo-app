@@ -84,38 +84,63 @@ describe("GET /tasks - latest 5 tasks", () => {
 describe("POST /tasks - create a task", () => {
   it("should be defined", async () => {
     const response = await request(app).post("/tasks");
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
   });
 
-  it("should have name and description in the request body", async () => {
+  it("should return 400 if title is missing", async () => {
+    const response = await request(app)
+      .post("/tasks")
+      .send({ description: "Description 6" })
+      .set("Accept", "application/json");
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error[0].path).toBe("body.title");
+  });
+
+  it("should return 400 if description is missing", async () => {
+    const response = await request(app)
+      .post("/tasks")
+      .send({ title: "Task 6" })
+      .set("Accept", "application/json");
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error[0].path).toBe("body.description");
+  });
+
+  it("should create a task with valid title and description", async () => {
     const newTask = {
       title: "Task 6",
       description: "Description 6",
     };
     const response = await request(app)
       .post("/tasks")
-      .send({ title: newTask.title, description: newTask.description })
+      .send(newTask)
       .set("Accept", "application/json");
 
+    expect(response.status).toBe(200);
     expect(response.body.task.title).toBe(newTask.title);
     expect(response.body.task.description).toBe(newTask.description);
   });
 });
 
-describe("PATCH /tasks/:id/done - mark a task as done", () => {
-  it("should be defined", async () => {
-    const id = "550e8400-e29b-41d4-a716-446655440000";
-    const response = await request(app).patch(`/tasks/${id}/done`).set("Accept", "application/json");;
-    expect(response.status).toBe(200);
+
+describe("PATCH /tasks/:id/done - mark task as done", () => {
+
+  it("should return 400 if id is not a valid UUID", async () => {
+    const response = await request(app).patch("/tasks/123/done");
+    expect(response.status).toBe(400);
+    expect(response.body.error[0].message).toBe("Invalid task ID format");
   });
 
-  it("should have name and description in the request body", async () => {
-    const id = "550e8400-e29b-41d4-a716-446655440000";
+  it("should mark task as done with valid UUID", async () => {
+    const validUUID = "550e8400-e29b-41d4-a716-446655440000";
     const response = await request(app)
-      .patch(`/tasks/${id}/done`)
+      .patch(`/tasks/${validUUID}/done`)
       .set("Accept", "application/json");
 
-    expect(response.body.task.id).toBe(id);
+    expect(response.status).toBe(200);
+    expect(response.body.task.id).toBe(validUUID);
     expect(response.body.task.isDone).toBe(true);
   });
 });

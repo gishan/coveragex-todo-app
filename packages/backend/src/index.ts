@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { createTask, fetchLatestTasks, markTaskAsDone } from './service';
+import { validate, createTaskSchema, markTaskAsDoneSchema } from './validation';
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.get('/tasks', async (req: Request, res: Response) => {
 });
 
 // create a task
-app.post('/tasks', async (req: Request, res: Response) => {
+app.post('/tasks', validate(createTaskSchema), async (req: Request, res: Response) => {
     const { title, description } = req.body;
     try {
         const createdTask = await createTask(title, description);
@@ -39,7 +40,7 @@ app.post('/tasks', async (req: Request, res: Response) => {
 });
 
 // mark a task as done
-app.patch('/tasks/:id/done', async (req: Request, res: Response) => {
+app.patch('/tasks/:id/done', validate(markTaskAsDoneSchema), async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const updatedTask =  await markTaskAsDone(id as string);
